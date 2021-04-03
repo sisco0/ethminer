@@ -61,6 +61,7 @@ enum class MinerType
     Mixed,
     CL,
     CUDA,
+    VK,
     CPU
 };
 

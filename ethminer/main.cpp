@@ -31,6 +31,9 @@
 #if ETH_ETHASHCUDA
 #include <libethash-cuda/CUDAMiner.h>
 #endif
+#if ETH_ETHASHVK
+#include <libethash-vk/VulkanMiner.h>
+#endif
 #if ETH_ETHASHCPU
 #include <libethash-cpu/CPUMiner.h>
 #endif
@@ -232,6 +235,9 @@ public:
 #if ETH_ETHASHCUDA
                     "cu",
 #endif
+#if ETH_ETHASHVK
+                    "vk",
+#endif
 #if ETH_ETHASHCPU
                     "cp",
 #endif
@@ -307,7 +313,7 @@ public:
 
 #endif
 
-#if ETH_ETHASHCL || ETH_ETHASHCUDA || ETH_ETHASH_CPU
+#if ETH_ETHASHCL || ETH_ETHASHCUDA || ETH_ETHASHVK || ETH_ETHASH_CPU
 
         app.add_flag("--list-devices", m_shouldListDevices, "");
 
@@ -343,6 +349,12 @@ public:
 
         app.add_option("--cuda-streams,--cu-streams", m_CUSettings.streams, "", true)
             ->check(CLI::Range(1, 99));
+
+#endif
+
+#if ETH_ETHASHVK
+
+// TODO: Fill here with Vulkan Options
 
 #endif
 
@@ -515,6 +527,10 @@ public:
         if (m_minerType == MinerType::CUDA || m_minerType == MinerType::Mixed)
             CUDAMiner::enumDevices(m_DevicesCollection);
 #endif
+#if ETH_ETHASHVK
+        if (m_minerType == MinerType::VK || m_minerType == MinerType::Mixed)
+            VulkanMiner::enumDevices(m_DevicesCollection);
+#endif
 #if ETH_ETHASHCPU
         if (m_minerType == MinerType::CPU)
             CPUMiner::enumDevices(m_DevicesCollection);
@@ -537,6 +553,12 @@ public:
             {
                 cout << setw(5) << "CUDA ";
                 cout << setw(4) << "SM  ";
+            }
+#endif
+#if ETH_ETHASHVK
+            if (m_minerType == MinerType::VK || m_minerType == MinerType::Mixed)
+            {
+                cout << setw(5) << "VK ";
             }
 #endif
 #if ETH_ETHASHCL
@@ -568,14 +590,14 @@ public:
                 cout << setw(4) << "--- ";
             }
 #endif
-#if ETH_ETHASHCL
-            if (m_minerType == MinerType::CL || m_minerType == MinerType::Mixed)
+#if ETH_ETHASHCL || ETH_ETHASHVK
+            if (m_minerType == MinerType::CL || m_minerType == MinerType::VK || m_minerType == MinerType::Mixed)
                 cout << setw(5) << "---- ";
 #endif
             cout << resetiosflags(ios::left) << setw(13) << "------------"
                  << " ";
-#if ETH_ETHASHCL
-            if (m_minerType == MinerType::CL || m_minerType == MinerType::Mixed)
+#if ETH_ETHASHCL || ETH_ETHASHVK
+            if (m_minerType == MinerType::CL || m_minerType == MinerType::VK || m_minerType == MinerType::Mixed)
             {
                 cout << resetiosflags(ios::left) << setw(13) << "------------"
                      << " ";
@@ -613,6 +635,7 @@ public:
                     cout << setw(4) << it->second.cuCompute;
                 }
 #endif
+                // TODO Complete this with Vulkan information printing
 #if ETH_ETHASHCL
                 if (m_minerType == MinerType::CL || m_minerType == MinerType::Mixed)
                     cout << setw(5) << (it->second.clDetected ? "Yes" : "");
@@ -880,6 +903,16 @@ public:
                     "plain "
                     "TCP!!"
                  << endl;
+        }
+
+        if (ctx == "vk")
+        {
+            cout << "Vulkan Extended Options :" << endl
+                 << endl
+                 << "    Use this extended Vulkan arguments to fine tune the performance." << endl
+                 << "    Be advised default values are best generic findings by developers" << endl
+                 << endl
+                 << "    TODO" << endl;
         }
 
         if (ctx == "cl")

@@ -26,6 +26,10 @@
 #include <libethash-cuda/CUDAMiner.h>
 #endif
 
+#if ETH_ETHASHVK
+#include <libethash-vk/VulkanMiner.h>
+#endif
+
 #if ETH_ETHASHCPU
 #include <libethash-cpu/CPUMiner.h>
 #endif
